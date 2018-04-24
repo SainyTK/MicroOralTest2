@@ -1,0 +1,44 @@
+#include<avr/io.h>
+
+unsigned char text[20] = "Hello World";
+
+void USART_t(unsigned char data)
+{
+   while(!(UCSR0A&(1<<UDRE0)));
+      
+   UDR0 = data;
+}
+
+unsigned char USART_r()
+{
+   while(!(UCSR0A&(1<<RXC0)));
+      
+   return UDR0;
+}
+
+int main(void)
+{
+   
+   unsigned char x;
+   unsigned char i;
+   
+   UCSR0A = 0x00;
+   UCSR0B = 0x18;
+   UCSR0C = 0x06;
+   
+   UBRR0H = 0;
+   UBRR0L = 51;
+   
+   text[11] = 13;
+   text[12] = 10;
+   
+   for(i=0;i<13;i++)
+      USART_t(text[i]);
+   
+   while(1)
+   {
+      x = USART_r();
+      USART_t(13);
+      USART_t(x+2);
+   }
+}
